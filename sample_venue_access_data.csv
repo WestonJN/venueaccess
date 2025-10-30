@@ -1,0 +1,11 @@
+name,email,phone,hasAccess
+John Doe,john.doe@example.com,+1234567890,true
+Jane Smith,jane.smith@example.com,+0987654321,true
+Bob Johnson,bob.johnson@example.com,,false
+Alice Brown,alice@example.com,+1122334455,yes
+Charlie Wilson,charlie.wilson@company.com,+5556667777,true
+Diana Lee,diana.lee@venue.com,+9998887777,1
+Michael Chen,mike@email.com,,no
+Sarah Davis,sarah.davis@corp.com,+1231231234,granted
+Robert Taylor,robert@example.org,+4564564567,true
+Lisa Anderson,lisa.anderson@mail.com,,0

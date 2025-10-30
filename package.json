@@ -11,13 +11,16 @@
   "dependencies": {
     "html5-qrcode": "^2.3.8",
     "next": "^15.5.6",
+    "papaparse": "^5.5.3",
     "qrcode": "^1.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/papaparse": "^5.3.16",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",

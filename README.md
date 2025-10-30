@@ -6,11 +6,14 @@ A simple and efficient web application for managing venue access using QR codes.
 
 ### ✅ Core Features Implemented
 - **User Management**: Add, edit, and delete people with their contact information
+- **🆕 Bulk Upload**: Excel/CSV file upload with validation and QR generation
 - **QR Code Generation**: Automatic generation of unique QR codes for each person
 - **QR Code Scanning**: Real-time QR code scanning using device camera
-- **Search Functionality**: Search people by name, email, or phone number
+- **🆕 Database Search**: Real-time search through entire database
+- **🆕 Access Statistics**: Dashboard showing database status and access counts
 - **Manual Access Control**: Grant access manually without QR codes
 - **Access Logging**: Complete audit trail of all access attempts
+- **🆕 Data Export**: Export database and logs to JSON format
 - **Real-time Status**: Live access status updates
 - **Data Persistence**: Local storage for offline functionality
 
@@ -59,12 +62,22 @@ npm start
 ## How to Use
 
 ### 1. Managing People
+
+#### **Individual Entry**
 1. Click **"Manage Access"** tab
 2. Click **"Add Person"** to add new people
 3. Fill in their details (name is required, email and phone are optional)
 4. Each person automatically gets a unique QR code
 5. Use the search bar to find specific people
 6. Toggle access permissions using the **"Grant/Revoke Access"** buttons
+
+#### **🆕 Bulk Upload (NEW!)**
+1. Click **"Bulk Upload"** button (green button)
+2. Download the template Excel/CSV file or use your own
+3. Required column: `name` | Optional: `email`, `phone`, `hasAccess`
+4. Upload your file - system validates and shows preview
+5. Confirm upload - QR codes generated automatically
+6. Duplicates are automatically avoided based on name/email
 
 ### 2. QR Code Operations
 - **Download QR Codes**: Click "Download QR Code" on any person card
@@ -73,21 +86,26 @@ npm start
 
 ### 3. Access Verification
 1. Click **"Scan QR Code"** tab
-2. Click **"Start Scanning"** 
-3. Point camera at QR code
-4. System will automatically:
+2. **🆕 View Database Statistics** - see total people, access granted/denied counts
+3. Click **"Start Scanning"** 
+4. Point camera at QR code
+5. System will automatically:
    - ✅ Grant access if person has permissions
    - ❌ Deny access if person doesn't have permissions  
    - ⚠️ Show "Not Found" for unrecognized QR codes
 
-### 4. Manual Access
-- Use the **"Manual Access"** section to grant access without QR scanning
-- Useful for backup access or when QR codes aren't working
+### 4. **🆕 Enhanced Manual Access & Database Search**
+- **Real-time search** through entire database by name, email, or phone
+- **Visual access indicators** - green for granted, red for denied
+- **Quick manual access** for people with permissions
+- **Database lookup** - verify anyone's status instantly
+- **Backup access method** when QR codes aren't working
 
-### 5. Access Logs
-- View complete history of all access attempts
-- See timestamps, methods (QR scan vs manual), and results
-- Clear logs when needed for privacy
+### 5. **🆕 Data Management**
+- **Access Logs**: Complete history with timestamps and methods
+- **Export Data**: Download database and logs as JSON
+- **Clear Logs**: Privacy-friendly log management
+- **Duplicate Prevention**: Smart merging avoids duplicate entries
 
 ## Project Structure
 
@@ -190,14 +208,16 @@ QR codes contain JSON data with the following structure:
 ## Future Enhancements
 
 ### Planned Features
-- [ ] **Cloud Sync**: Database integration with PostgreSQL/MongoDB
+- [ ] **Cloud Sync**: Database integration with PostgreSQL/MongoDB  
 - [ ] **Multi-venue Support**: Manage multiple venues from one interface
 - [ ] **Advanced Analytics**: Access patterns and reporting
 - [ ] **Mobile App**: React Native version for mobile devices
-- [ ] **Bulk Import**: CSV import for large user lists
+- [x] **✅ Bulk Import**: CSV/Excel import for large user lists *(COMPLETED)*
 - [ ] **Access Schedules**: Time-based access permissions
 - [ ] **Visitor Management**: Temporary access for guests
 - [ ] **Integration APIs**: Connect with other systems
+- [x] **✅ Database Search**: Real-time search functionality *(COMPLETED)*
+- [x] **✅ Data Export**: Backup and export capabilities *(COMPLETED)*
 
 ### Technical Improvements
 - [ ] **Real-time Updates**: WebSocket support for live updates

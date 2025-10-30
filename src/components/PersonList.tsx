@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Person } from '@/types'
 import PersonForm from './PersonForm'
 import PersonCard from './PersonCard'
+import BulkUpload from './BulkUpload'
 
 interface PersonListProps {
   people: Person[]
@@ -14,6 +15,7 @@ export default function PersonList({ people, onUpdatePeople }: PersonListProps) 
   const [showForm, setShowForm] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [editingPerson, setEditingPerson] = useState<Person | null>(null)
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
 
   const filteredPeople = people.filter(person =>
     person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -41,6 +43,40 @@ export default function PersonList({ people, onUpdatePeople }: PersonListProps) 
     ))
   }
 
+  const handleBulkUpload = (newPeople: Person[]) => {
+    // Merge with existing people, avoiding duplicates based on email or name
+    const existingEmails = new Set(people.map(p => p.email?.toLowerCase()).filter(Boolean))
+    const existingNames = new Set(people.map(p => p.name.toLowerCase()))
+    
+    const uniqueNewPeople = newPeople.filter(person => {
+      const emailExists = person.email && existingEmails.has(person.email.toLowerCase())
+      const nameExists = existingNames.has(person.name.toLowerCase())
+      return !emailExists && !nameExists
+    })
+    
+    onUpdatePeople([...people, ...uniqueNewPeople])
+    setShowBulkUpload(false)
+  }
+
+  const handleExportData = () => {
+    const dataToExport = people.map(person => ({
+      name: person.name,
+      email: person.email || '',
+      phone: person.phone || '',
+      hasAccess: person.hasAccess,
+      createdAt: person.createdAt.toISOString(),
+      lastAccessed: person.lastAccessed?.toISOString() || ''
+    }))
+    
+    const dataStr = JSON.stringify(dataToExport, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `venue_access_data_${new Date().toISOString().split('T')[0]}.json`
+    link.click()
+  }
+
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header with Add Button and Search */}
@@ -57,12 +93,28 @@ export default function PersonList({ people, onUpdatePeople }: PersonListProps) 
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md font-medium transition-colors"
-            >
-              Add Person
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowForm(true)}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
+              >
+                Add Person
+              </button>
+              <button
+                onClick={() => setShowBulkUpload(true)}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
+              >
+                Bulk Upload
+              </button>
+              {people.length > 0 && (
+                <button
+                  onClick={handleExportData}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
+                >
+                  Export
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -81,6 +133,14 @@ export default function PersonList({ people, onUpdatePeople }: PersonListProps) 
             />
           </div>
         </div>
+      )}
+
+      {/* Bulk Upload Modal */}
+      {showBulkUpload && (
+        <BulkUpload
+          onUpload={handleBulkUpload}
+          onClose={() => setShowBulkUpload(false)}
+        />
       )}
 
       {/* People Grid */}

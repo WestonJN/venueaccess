@@ -14,6 +14,7 @@ export default function QRScanner({ people, onUpdatePeople }: QRScannerProps) {
   const [isScanning, setIsScanning] = useState(false)
   const [scanResult, setScanResult] = useState<string | null>(null)
   const [accessLogs, setAccessLogs] = useState<AccessLog[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
   const scannerRef = useRef<Html5QrcodeScanner | null>(null)
 
   useEffect(() => {
@@ -152,8 +153,39 @@ export default function QRScanner({ people, onUpdatePeople }: QRScannerProps) {
     localStorage.removeItem('venue-access-logs')
   }
 
+  // Calculate database statistics
+  const totalPeople = people.length
+  const peopleWithAccess = people.filter(p => p.hasAccess).length
+  const peopleWithoutAccess = totalPeople - peopleWithAccess
+
+  // Filter people for search
+  const filteredPeople = people.filter(person =>
+    person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    person.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    person.phone?.includes(searchTerm)
+  )
+
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Database Statistics */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">Database Status</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-blue-700">{totalPeople}</div>
+            <div className="text-sm text-blue-600">Total People</div>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-green-700">{peopleWithAccess}</div>
+            <div className="text-sm text-green-600">Access Granted</div>
+          </div>
+          <div className="bg-red-50 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-red-700">{peopleWithoutAccess}</div>
+            <div className="text-sm text-red-600">Access Denied</div>
+          </div>
+        </div>
+      </div>
+
       {/* QR Scanner Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">QR Code Scanner</h2>
@@ -197,24 +229,56 @@ export default function QRScanner({ people, onUpdatePeople }: QRScannerProps) {
 
       {/* Manual Access Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Manual Access</h3>
-        <div className="space-y-2">
-          {people.filter(p => p.hasAccess).map((person) => (
-            <div key={person.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <div>
-                <span className="font-medium">{person.name}</span>
-                {person.email && <span className="text-gray-600 ml-2">({person.email})</span>}
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">Manual Access & Database Search</h3>
+        </div>
+        
+        {/* Search Bar */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search people in database..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        
+        <div className="space-y-2 max-h-64 overflow-y-auto">
+          {filteredPeople.length === 0 && searchTerm && (
+            <p className="text-gray-500 text-center py-4">No people found matching &ldquo;{searchTerm}&rdquo;</p>
+          )}
+          
+          {(searchTerm ? filteredPeople : people.filter(p => p.hasAccess)).map((person) => (
+            <div key={person.id} className={`flex justify-between items-center p-3 rounded-lg ${
+              person.hasAccess ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+            }`}>
+              <div className="flex-1">
+                <div className="flex items-center">
+                  <span className="font-medium">{person.name}</span>
+                  <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                    person.hasAccess 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {person.hasAccess ? 'Access Granted' : 'Access Denied'}
+                  </span>
+                </div>
+                {person.email && <div className="text-gray-600 text-sm">{person.email}</div>}
+                {person.phone && <div className="text-gray-600 text-sm">{person.phone}</div>}
               </div>
-              <button
-                onClick={() => grantManualAccess(person.id)}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
-              >
-                Grant Access
-              </button>
+              {person.hasAccess && (
+                <button
+                  onClick={() => grantManualAccess(person.id)}
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
+                >
+                  Grant Access
+                </button>
+              )}
             </div>
           ))}
-          {people.filter(p => p.hasAccess).length === 0 && (
-            <p className="text-gray-500 text-center py-4">No people with access permissions found.</p>
+          {!searchTerm && people.filter(p => p.hasAccess).length === 0 && (
+            <p className="text-gray-500 text-center py-4">No people with access permissions found. Upload a database to get started.</p>
           )}
         </div>
       </div>
