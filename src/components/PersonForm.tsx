@@ -16,7 +16,7 @@ export default function PersonForm({ person, onSave, onCancel }: PersonFormProps
     name: person?.name || '',
     email: person?.email || '',
     phone: person?.phone || '',
-    hasAccess: person?.hasAccess || true
+    hasAccess: person?.hasAccess || false // Default to NO ACCESS for new people
   })
   const [isLoading, setIsLoading] = useState(false)
 
@@ -126,18 +126,23 @@ export default function PersonForm({ person, onSave, onCancel }: PersonFormProps
           />
         </div>
 
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="hasAccess"
-            name="hasAccess"
-            checked={formData.hasAccess}
-            onChange={handleChange}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          />
-          <label htmlFor="hasAccess" className="ml-2 block text-sm text-gray-700">
-            Grant access
-          </label>
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="hasAccess"
+              name="hasAccess"
+              checked={formData.hasAccess}
+              onChange={handleChange}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="hasAccess" className="ml-2 block text-sm text-gray-700">
+              Grant access permissions (optional)
+            </label>
+          </div>
+          <p className="text-xs text-yellow-700 mt-2">
+            By default, new people are added without access. You can grant access later or during QR code scanning.
+          </p>
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">

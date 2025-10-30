@@ -92,16 +92,21 @@ export default function PersonCard({ person, onEdit, onDelete, onToggleAccess }:
 
       {/* Actions */}
       <div className="flex space-x-2">
-        <button
-          onClick={onToggleAccess}
-          className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
-            person.hasAccess
-              ? 'bg-red-500 hover:bg-red-600 text-white'
-              : 'bg-green-500 hover:bg-green-600 text-white'
-          }`}
-        >
-          {person.hasAccess ? 'Revoke Access' : 'Grant Access'}
-        </button>
+        {!person.hasAccess ? (
+          <button
+            onClick={onToggleAccess}
+            className="flex-1 py-2 px-4 rounded-md font-medium transition-colors bg-green-500 hover:bg-green-600 text-white"
+          >
+            Grant Access
+          </button>
+        ) : (
+          <button
+            onClick={onToggleAccess}
+            className="flex-1 py-2 px-4 rounded-md font-medium transition-colors bg-red-500 hover:bg-red-600 text-white"
+          >
+            Revoke Access
+          </button>
+        )}
       </div>
 
       {/* Last Accessed */}

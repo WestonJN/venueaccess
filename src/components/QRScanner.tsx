@@ -91,27 +91,29 @@ export default function QRScanner({ people, onUpdatePeople }: QRScannerProps) {
     const person = people.find(p => p.id === qrData.id)
     
     if (person) {
-      const accessGranted = person.hasAccess
+      // AUTOMATICALLY GRANT ACCESS when QR is scanned and person exists in database
       const log: AccessLog = {
         id: uuidv4(),
         personId: person.id,
         personName: person.name,
         timestamp: new Date(),
-        granted: accessGranted,
+        granted: true, // Always grant access for valid QR scans
         method: 'qr-scan'
       }
       
       addAccessLog(log)
       
-      // Update person's last accessed time if access granted
-      if (accessGranted) {
-        const updatedPeople = people.map(p => 
-          p.id === person.id ? { ...p, lastAccessed: new Date() } : p
-        )
-        onUpdatePeople(updatedPeople)
-      }
+      // Update person's access status and last accessed time
+      const updatedPeople = people.map(p => 
+        p.id === person.id ? { 
+          ...p, 
+          hasAccess: true, // Grant access automatically
+          lastAccessed: new Date() 
+        } : p
+      )
+      onUpdatePeople(updatedPeople)
       
-      setScanResult(accessGranted ? 'granted' : 'denied')
+      setScanResult('granted')
     } else {
       const log: AccessLog = {
         id: uuidv4(),
@@ -267,14 +269,16 @@ export default function QRScanner({ people, onUpdatePeople }: QRScannerProps) {
                 {person.email && <div className="text-gray-600 text-sm">{person.email}</div>}
                 {person.phone && <div className="text-gray-600 text-sm">{person.phone}</div>}
               </div>
-              {person.hasAccess && (
-                <button
-                  onClick={() => grantManualAccess(person.id)}
-                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
-                >
-                  Grant Access
-                </button>
-              )}
+              <button
+                onClick={() => grantManualAccess(person.id)}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  person.hasAccess 
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                    : 'bg-green-500 hover:bg-green-600 text-white'
+                }`}
+              >
+                {person.hasAccess ? 'Grant Again' : 'Grant Access'}
+              </button>
             </div>
           ))}
           {!searchTerm && people.filter(p => p.hasAccess).length === 0 && (

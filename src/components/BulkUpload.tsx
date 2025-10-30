@@ -81,8 +81,8 @@ export default function BulkUpload({ onUpload, onClose }: BulkUploadProps) {
         }
       }
 
-      // Parse access permission
-      let hasAccess = true
+      // Parse access permission - DEFAULT TO FALSE (no access)
+      let hasAccess = false
       if (row.hasAccess !== undefined) {
         if (typeof row.hasAccess === 'boolean') {
           hasAccess = row.hasAccess
@@ -244,6 +244,7 @@ export default function BulkUpload({ onUpload, onClose }: BulkUploadProps) {
               <li>• Required column: <code className="bg-blue-100 px-1 rounded">name</code></li>
               <li>• Optional columns: <code className="bg-blue-100 px-1 rounded">email</code>, <code className="bg-blue-100 px-1 rounded">phone</code>, <code className="bg-blue-100 px-1 rounded">hasAccess</code></li>
               <li>• Access values: true/false, yes/no, 1/0, granted/denied</li>
+              <li>• <strong>Default:</strong> People are uploaded WITHOUT access (grant manually or via QR scan)</li>
             </ul>
             <button
               onClick={handleDownloadTemplate}
